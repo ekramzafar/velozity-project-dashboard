@@ -1,7 +1,6 @@
 # Velozity Project Dashboard
 
-A full-stack real-time project management dashboard built with React,
-TypeScript, Node.js, Express, PostgreSQL, Prisma and Socket.IO.
+A full-stack real-time project management dashboard built with React, TypeScript, Node.js, Express, PostgreSQL, Prisma and Socket.IO.
 
 ## Features
 
@@ -71,9 +70,11 @@ Express Server
               |
               v
          PostgreSQL
+```
 
 Real-time communication:
 
+```text
 React Client
      |
      | Socket.IO
@@ -85,6 +86,8 @@ Socket.IO Server
      +--> Project Rooms
      |
      +--> Real-time Events
+```
+
 ---
 
 ## Roles and Permissions
@@ -116,10 +119,9 @@ Socket.IO Server
 - Receive status notifications
 - Receive overdue notifications
 
-Authorization is enforced server-side.
-
-Frontend route protection is only used for user experience and is not
-considered a security boundary.
+> Authorization is enforced server-side.
+>
+> Frontend route protection is only used for user experience and is not considered a security boundary.
 
 ---
 
@@ -155,12 +157,9 @@ User
  +---- ActivityLogs
  +---- Notifications
  +---- RefreshTokens
-            |
-            +---- RefreshTokens
+```
 
----
-
-## Task
+### Task
 
 A task contains:
 
@@ -173,16 +172,15 @@ A task contains:
 - Due date
 - Created and updated timestamps
 
-### Supported Statuses
+**Supported Statuses**
 
-```text
-TODO
-IN_PROGRESS
-IN_REVIEW
-DONE
-OVERDUE
+- TODO
+- IN_PROGRESS
+- IN_REVIEW
+- DONE
+- OVERDUE
 
-### Supported Priorities
+**Supported Priorities**
 
 - LOW
 - MEDIUM
@@ -214,210 +212,259 @@ The refresh token is used to obtain a new access token.
 
 ## Real-Time Communication
 
-Socket.IO provides real-time communication between authenticated clients
-and the backend.
+Socket.IO provides real-time communication between authenticated clients and the backend.
 
 ### Important Events
 
-```text
-task:created
-task:status_updated
-task:assigned
-task:overdue
-notification:new
-presence:update
-
-Uske turant neeche:
+- `task:created`
+- `task:status_updated`
+- `task:assigned`
+- `task:overdue`
+- `notification:new`
+- `presence:update`
 
 User-specific notifications are sent through user rooms:
 
 ```text
 user:<userId>
+```
 
 Project-level task events use:
 
+```text
 project:<projectId>
+```
 
 The Socket.IO connection is authenticated using the JWT access token.
 
-Notifications
+---
 
-Notifications are persisted in PostgreSQL and delivered in real time
-through Socket.IO.
+## Notifications
+
+Notifications are persisted in PostgreSQL and delivered in real time through Socket.IO.
 
 Examples include:
 
-New task assignment
-Task status update
-Task becoming overdue
-Task moved to In Review
+- New task assignment
+- Task status update
+- Task becoming overdue
+- Task moved to In Review
 
-When a developer moves a task to IN_REVIEW, the Project Manager receives
-a real-time Task Ready for Review notification.
+When a developer moves a task to IN_REVIEW, the Project Manager receives a real-time "Task Ready for Review" notification.
 
 Users can:
 
-View notifications
-Mark individual notifications as read
-Mark all notifications as read
-Overdue Scheduler
+- View notifications
+- Mark individual notifications as read
+- Mark all notifications as read
 
-The backend uses node-cron to periodically check for overdue tasks.
+---
+
+## Overdue Scheduler
+
+The backend uses `node-cron` to periodically check for overdue tasks.
 
 A task becomes overdue when:
 
+```text
 dueDate < current time
 AND
 status != DONE
+```
 
 The scheduler then:
 
-Updates the task status to OVERDUE.
-Creates an activity log.
-Emits a real-time overdue event.
-Sends a notification to the assigned developer.
+1. Updates the task status to `OVERDUE`.
+2. Creates an activity log.
+3. Emits a real-time overdue event.
+4. Sends a notification to the assigned developer.
 
 This process runs on the backend and does not depend on frontend polling.
 
-API Overview
+---
 
-Base URL:
+## API Overview
 
+**Base URL**
+
+```text
 http://localhost:5000/api
-Authentication
+```
+
+### Authentication
+
+```
 POST /auth/login
 POST /auth/refresh
 POST /auth/logout
 GET  /auth/me
-Projects
+```
+
+### Projects
+
+```
 GET    /projects
 GET    /projects/:id
 POST   /projects
 PATCH  /projects/:id
 DELETE /projects/:id
-Tasks
+```
+
+### Tasks
+
+```
 GET   /tasks
 GET   /tasks/:id
 POST  /tasks
 PATCH /tasks/:id/status
 PATCH /tasks/:id/assign
-Activity
+```
+
+### Activity
+
+```
 GET /activity
-Notifications
+```
+
+### Notifications
+
+```
 GET   /notifications
 PATCH /notifications/:id/read
 PATCH /notifications/read-all
-Dashboard
+```
+
+### Dashboard
+
+```
 GET /dashboard
-Health
+```
+
+### Health
+
+```
 GET /health
-Validation and Security
+```
+
+---
+
+## Validation and Security
 
 The backend performs server-side validation and authorization.
 
 Security measures include:
 
-Zod request validation
-JWT authentication
-HttpOnly refresh-token cookie
-Hashed refresh tokens
-bcrypt password verification
-Server-side RBAC
-Project ownership checks
-Developer assignment validation
-Protected API routes
-Authenticated Socket.IO connections
-Configured CORS
+- Zod request validation
+- JWT authentication
+- HttpOnly refresh-token cookie
+- Hashed refresh tokens
+- bcrypt password verification
+- Server-side RBAC
+- Project ownership checks
+- Developer assignment validation
+- Protected API routes
+- Authenticated Socket.IO connections
+- Configured CORS
 
-A user cannot access another user's protected resources simply by changing
-frontend routes or request parameters.
+> A user cannot access another user's protected resources simply by changing frontend routes or request parameters.
 
-Local Development
-Prerequisites
-Node.js 20+
-npm
-PostgreSQL 16+
-Backend
+---
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- PostgreSQL 16+
+
+### Backend
+
+```bash
 cd server
 npm install
+```
 
-Create server/.env using server/.env.example.
+Create `server/.env` using `server/.env.example`.
 
 Then run:
 
+```bash
 npx prisma migrate dev
 npm run prisma:seed
 npm run dev
+```
 
-Backend:
+Backend: `http://localhost:5000`
 
-http://localhost:5000
-
-Frontend
+### Frontend
 
 Open another terminal:
 
+```bash
 cd client
 npm install
 npm run dev
+```
 
-Frontend:
+Frontend: `http://localhost:5173`
 
-http://localhost:5173
-
-Environment Variables
+### Environment Variables
 
 Example:
 
+```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5433/velozity_dashboard?schema=public"
 JWT_ACCESS_SECRET="replace-with-a-strong-access-secret"
 JWT_REFRESH_SECRET="replace-with-a-strong-refresh-secret"
 PORT=5000
 CLIENT_URL="http://localhost:5173"
+```
 
-Never commit the real .env file.
+> Never commit the real `.env` file.
+>
+> Production deployments should use strong environment-specific secrets.
 
-Production deployments should use strong environment-specific secrets.
+---
 
-Seed Data
+## Seed Data
 
 The project includes seed data for demonstration.
 
 Run:
 
+```bash
 npm run prisma:seed
+```
 
 The seed creates:
 
-Admin users
-Project Managers
-Developers
-Clients
-Projects
-Tasks
-Activities
-Notifications
+- Admin users
+- Project Managers
+- Developers
+- Clients
+- Projects
+- Tasks
+- Activities
+- Notifications
 
 Some tasks have past due dates to demonstrate the overdue scheduler.
 
-Demo Credentials
+### Demo Credentials
 
-All seeded users use:
+All seeded users use password: `Password123!`
 
-Password123!
-Admin
+| Role            | Email                  |
+|-----------------|-------------------------|
+| Admin           | admin@velozity.com      |
+| Project Manager | sarah@velozity.com      |
+| Developer       | alice@velozity.com      |
 
-admin@velozity.com
+---
 
-Project Manager
+## Project Structure
 
-sarah@velozity.com
-
-Developer
-
-alice@velozity.com
-
-Project Structure
+```text
 velozity-project-dashboard/
 │
 ├── client/
@@ -446,96 +493,115 @@ velozity-project-dashboard/
 ├── .gitignore
 ├── README.md
 └── prisma7.config.ts
-Verification
-Backend
+```
+
+---
+
+## Verification
+
+### Backend
+
+```bash
 cd server
 npm run build
-Frontend
+```
+
+### Frontend
+
+```bash
 cd client
 npm run build
+```
 
 Before submission verify:
 
-Login works
-Refresh token works
-Logout works
-Server-side RBAC works
-Project ownership works
-Developer task restrictions work
-Task status updates work
-Real-time task updates work
-Real-time notifications work
-Activity logs work
-Notifications can be marked as read
-Overdue scheduler works
-Seed data works
-Backend builds successfully
-Frontend builds successfully
-Known Limitations
-Local development uses HTTP.
-Development JWT secrets are intended for local use only.
-Production should use HTTPS and secure cookies.
-Some task filtering is currently performed client-side.
-Socket.IO requires a persistent backend runtime in production.
-Production deployment requires environment-specific configuration.
-Architectural Decisions
-TypeScript
+- [ ] Login works
+- [ ] Refresh token works
+- [ ] Logout works
+- [ ] Server-side RBAC works
+- [ ] Project ownership works
+- [ ] Developer task restrictions work
+- [ ] Task status updates work
+- [ ] Real-time task updates work
+- [ ] Real-time notifications work
+- [ ] Activity logs work
+- [ ] Notifications can be marked as read
+- [ ] Overdue scheduler works
+- [ ] Seed data works
+- [ ] Backend builds successfully
+- [ ] Frontend builds successfully
 
-TypeScript provides type safety across the frontend and backend and helps
-catch errors during development.
+---
 
-Prisma
+## Known Limitations
 
-Prisma provides a strongly typed database client and migration workflow
-while using PostgreSQL as the relational database.
+- Local development uses HTTP.
+- Development JWT secrets are intended for local use only.
+- Production should use HTTPS and secure cookies.
+- Some task filtering is currently performed client-side.
+- Socket.IO requires a persistent backend runtime in production.
+- Production deployment requires environment-specific configuration.
 
-Socket.IO
+---
 
-Socket.IO provides reliable real-time communication for task updates,
-notifications, and presence.
+## Architectural Decisions
 
-Server-Side RBAC
+### TypeScript
 
-Authorization is implemented on the backend because frontend-only access
-control can be bypassed by directly calling APIs.
+TypeScript provides type safety across the frontend and backend and helps catch errors during development.
 
-HttpOnly Refresh Token
+### Prisma
 
-The refresh token is stored in an HttpOnly cookie so client-side JavaScript
-cannot directly access it.
+Prisma provides a strongly typed database client and migration workflow while using PostgreSQL as the relational database.
 
-Future Improvements
+### Socket.IO
+
+Socket.IO provides reliable real-time communication for task updates, notifications, and presence.
+
+### Server-Side RBAC
+
+Authorization is implemented on the backend because frontend-only access control can be bypassed by directly calling APIs.
+
+### HttpOnly Refresh Token
+
+The refresh token is stored in an HttpOnly cookie so client-side JavaScript cannot directly access it.
+
+---
+
+## Future Improvements
 
 Potential improvements include:
 
-Server-side task filtering
-Due-date range filtering
-Pagination
-Automated RBAC tests
-API integration tests
-Refresh-token rotation
-Rate limiting
-Centralized structured error middleware
-Redis Socket.IO adapter for horizontal scaling
-Production monitoring
-Automated deployment
-Submission
+- Server-side task filtering
+- Due-date range filtering
+- Pagination
+- Automated RBAC tests
+- API integration tests
+- Refresh-token rotation
+- Rate limiting
+- Centralized structured error middleware
+- Redis Socket.IO adapter for horizontal scaling
+- Production monitoring
+- Automated deployment
+
+---
+
+## Submission
 
 This project demonstrates a complete full-stack workflow using:
 
-React
-TypeScript
-Node.js
-Express
-PostgreSQL
-Prisma
-JWT
-Server-side RBAC
-Socket.IO
-Real-time notifications
-Activity logging
-Background processing
-Seed data
+- React
+- TypeScript
+- Node.js
+- Express
+- PostgreSQL
+- Prisma
+- JWT
+- Server-side RBAC
+- Socket.IO
+- Real-time notifications
+- Activity logging
+- Background processing
+- Seed data
 
-The application is designed around server-side authorization, modular
-business logic, relational data integrity, and real-time user experience.
+The application is designed around server-side authorization, modular business logic, relational data integrity, and real-time user experience.
